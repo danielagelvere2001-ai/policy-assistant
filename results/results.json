@@ -1,0 +1,790 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "type": "direct",
+      "question": "How many vacation days do I get per year?",
+      "expected": [
+        "Vacation Policy"
+      ],
+      "answers": {
+        "rules": {
+          "approach": "Rules-based search",
+          "question": "How many vacation days do I get per year?",
+          "answer": "According to the Vacation Policy: Employees receive 15 vacation days per year. Unused days may roll over.",
+          "policy_title": "Vacation Policy",
+          "time_ms": 0.5378997884690762,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0,
+          "extra": {
+            "top": [
+              {
+                "title": "Vacation Policy",
+                "score": 18.46
+              },
+              {
+                "title": "Remote Work Policy",
+                "score": 6.4
+              },
+              {
+                "title": "Warranty Policy",
+                "score": 3.68
+              }
+            ]
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Quotes the Vacation Policy, which answers the question."
+        },
+        "llm": {
+          "approach": "LLM without vector index",
+          "question": "How many vacation days do I get per year?",
+          "answer": "Employees receive 15 vacation days per year. Unused days may roll over.",
+          "policy_title": "Vacation Policy",
+          "time_ms": 27450.56110015139,
+          "input_tokens": 2811,
+          "output_tokens": 38,
+          "total_tokens": 2849,
+          "extra": {
+            "context_policies": 98
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Every claim matches the cited policy text."
+        },
+        "vector": {
+          "approach": "LLM with vector index",
+          "question": "How many vacation days do I get per year?",
+          "answer": "Under the Vacation Policy, employees receive 15 vacation days per year. Unused days may roll over.",
+          "policy_title": "Vacation Policy",
+          "time_ms": 13124.527800362557,
+          "input_tokens": 266,
+          "output_tokens": 85,
+          "total_tokens": 351,
+          "extra": {
+            "retrieved": [
+              {
+                "title": "Vacation Policy",
+                "similarity": 0.721
+              },
+              {
+                "title": "Holiday Schedule Policy",
+                "similarity": 0.639
+              },
+              {
+                "title": "Work From Abroad Policy",
+                "similarity": 0.621
+              }
+            ],
+            "embedding_tokens": 10
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Every claim matches the cited policy text."
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "paraphrase",
+      "question": "How many days a week can I work from home?",
+      "expected": [
+        "Remote Work Policy"
+      ],
+      "answers": {
+        "rules": {
+          "approach": "Rules-based search",
+          "question": "How many days a week can I work from home?",
+          "answer": "According to the Home Office Equipment Policy: Employees may request ergonomic equipment for remote work.",
+          "policy_title": "Home Office Equipment Policy",
+          "time_ms": 1.1301999911665916,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0,
+          "extra": {
+            "top": [
+              {
+                "title": "Home Office Equipment Policy",
+                "score": 10.56
+              },
+              {
+                "title": "Remote Work Policy",
+                "score": 10.42
+              },
+              {
+                "title": "Work From Abroad Policy",
+                "score": 4.9
+              }
+            ]
+          },
+          "policy_correct": false,
+          "verdict": "UNSUPPORTED",
+          "reason": "Presents the Home Office Equipment Policy as the answer; it says nothing about how many days one may work from home."
+        },
+        "llm": {
+          "approach": "LLM without vector index",
+          "question": "How many days a week can I work from home?",
+          "answer": "According to the Remote Work Policy, employees may work remotely up to three days per week with manager approval.",
+          "policy_title": "Remote Work Policy",
+          "time_ms": 79332.86390034482,
+          "input_tokens": 2812,
+          "output_tokens": 42,
+          "total_tokens": 2854,
+          "extra": {
+            "context_policies": 98
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Every claim matches the cited policy text."
+        },
+        "vector": {
+          "approach": "LLM with vector index",
+          "question": "How many days a week can I work from home?",
+          "answer": "Under the Remote Work Policy, employees may work remotely up to three days per week with manager approval.",
+          "policy_title": "Remote Work Policy",
+          "time_ms": 4629.177400376648,
+          "input_tokens": 266,
+          "output_tokens": 32,
+          "total_tokens": 298,
+          "extra": {
+            "retrieved": [
+              {
+                "title": "Remote Work Policy",
+                "similarity": 0.71
+              },
+              {
+                "title": "Flexible Hours Policy",
+                "similarity": 0.642
+              },
+              {
+                "title": "Work From Abroad Policy",
+                "similarity": 0.636
+              }
+            ],
+            "embedding_tokens": 11
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Every claim matches the cited policy text."
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "paraphrase",
+      "question": "I'd like to spend a few weeks working from Spain. Is that okay?",
+      "expected": [
+        "Work From Abroad Policy"
+      ],
+      "answers": {
+        "rules": {
+          "approach": "Rules-based search",
+          "question": "I'd like to spend a few weeks working from Spain. Is that okay?",
+          "answer": "According to the Onboarding Policy: New hires must complete onboarding within their first week.",
+          "policy_title": "Onboarding Policy",
+          "time_ms": 0.821900088340044,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0,
+          "extra": {
+            "top": [
+              {
+                "title": "Onboarding Policy",
+                "score": 3.34
+              },
+              {
+                "title": "Remote Work Policy",
+                "score": 3.34
+              },
+              {
+                "title": "Parental Leave Policy",
+                "score": 3.34
+              }
+            ]
+          },
+          "policy_correct": false,
+          "verdict": "UNSUPPORTED",
+          "reason": "Presents the unrelated Onboarding Policy as the answer to a work-abroad question."
+        },
+        "llm": {
+          "approach": "LLM without vector index",
+          "question": "I'd like to spend a few weeks working from Spain. Is that okay?",
+          "answer": "According to the Work From Abroad Policy, employees may work abroad for up to 30 days with approval.",
+          "policy_title": "Work From Abroad Policy",
+          "time_ms": 23165.9347997047,
+          "input_tokens": 2818,
+          "output_tokens": 44,
+          "total_tokens": 2862,
+          "extra": {
+            "context_policies": 98
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Correctly states the 30-day limit with approval from the Work From Abroad Policy."
+        },
+        "vector": {
+          "approach": "LLM with vector index",
+          "question": "I'd like to spend a few weeks working from Spain. Is that okay?",
+          "answer": "Employees may work abroad for up to 30 days with approval. Please note that the policy does not specify exact approved countries such as Spain.",
+          "policy_title": "Work From Abroad Policy",
+          "time_ms": 2046.6249999590218,
+          "input_tokens": 285,
+          "output_tokens": 42,
+          "total_tokens": 327,
+          "extra": {
+            "retrieved": [
+              {
+                "title": "Work From Abroad Policy",
+                "similarity": 0.731
+              },
+              {
+                "title": "Remote Work Policy",
+                "similarity": 0.647
+              },
+              {
+                "title": "Vacation Policy",
+                "similarity": 0.64
+              }
+            ],
+            "embedding_tokens": 17
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Correctly states the 30-day limit with approval from the Work From Abroad Policy. Correctly notes that countries are not specified."
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "paraphrase",
+      "question": "My grandmother passed away. How many days off can I take?",
+      "expected": [
+        "Bereavement Leave Policy"
+      ],
+      "answers": {
+        "rules": {
+          "approach": "Rules-based search",
+          "question": "My grandmother passed away. How many days off can I take?",
+          "answer": "According to the Bereavement Leave Policy: Employees may take up to 5 days of bereavement leave.",
+          "policy_title": "Bereavement Leave Policy",
+          "time_ms": 0.5740998312830925,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0,
+          "extra": {
+            "top": [
+              {
+                "title": "Bereavement Leave Policy",
+                "score": 13.11
+              },
+              {
+                "title": "Parental Leave Policy",
+                "score": 3.68
+              },
+              {
+                "title": "Background Check Policy",
+                "score": 3.68
+              }
+            ]
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Quotes the Bereavement Leave Policy (up to 5 days)."
+        },
+        "llm": {
+          "approach": "LLM without vector index",
+          "question": "My grandmother passed away. How many days off can I take?",
+          "answer": "According to the Bereavement Leave Policy, employees may take up to 5 days of bereavement leave.",
+          "policy_title": "Bereavement Leave Policy",
+          "time_ms": 2465.42159980163,
+          "input_tokens": 2814,
+          "output_tokens": 42,
+          "total_tokens": 2856,
+          "extra": {
+            "context_policies": 98
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Every claim matches the cited policy text."
+        },
+        "vector": {
+          "approach": "LLM with vector index",
+          "question": "My grandmother passed away. How many days off can I take?",
+          "answer": "Under the Bereavement Leave Policy, employees may take up to 5 days of bereavement leave.",
+          "policy_title": "Bereavement Leave Policy",
+          "time_ms": 1944.9151000007987,
+          "input_tokens": 272,
+          "output_tokens": 41,
+          "total_tokens": 313,
+          "extra": {
+            "retrieved": [
+              {
+                "title": "Bereavement Leave Policy",
+                "similarity": 0.721
+              },
+              {
+                "title": "Vacation Policy",
+                "similarity": 0.63
+              },
+              {
+                "title": "Sick Leave Policy",
+                "similarity": 0.626
+              }
+            ],
+            "embedding_tokens": 13
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Every claim matches the cited policy text."
+        }
+      }
+    },
+    {
+      "id": 21,
+      "type": "detail-missing",
+      "question": "How many sick days do I accrue each month?",
+      "expected": [
+        "Sick Leave Policy"
+      ],
+      "answers": {
+        "rules": {
+          "approach": "Rules-based search",
+          "question": "How many sick days do I accrue each month?",
+          "answer": "According to the Sick Leave Policy: Employees accrue sick leave monthly for personal or family illness.",
+          "policy_title": "Sick Leave Policy",
+          "time_ms": 0.6384998559951782,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0,
+          "extra": {
+            "top": [
+              {
+                "title": "Sick Leave Policy",
+                "score": 15.92
+              },
+              {
+                "title": "Work From Abroad Policy",
+                "score": 2.72
+              },
+              {
+                "title": "Remote Work Policy",
+                "score": 2.72
+              }
+            ]
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Quotes the Sick Leave Policy verbatim and adds no number."
+        },
+        "llm": {
+          "approach": "LLM without vector index",
+          "question": "How many sick days do I accrue each month?",
+          "answer": "According to the Sick Leave Policy, employees accrue sick leave monthly for personal or family illness. However, the policy does not specify the exact number of sick days accrued each month.",
+          "policy_title": "Sick Leave Policy",
+          "time_ms": 2275.123099796474,
+          "input_tokens": 2811,
+          "output_tokens": 56,
+          "total_tokens": 2867,
+          "extra": {
+            "context_policies": 98
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "States what the policy says and that it does not specify the number of days."
+        },
+        "vector": {
+          "approach": "LLM with vector index",
+          "question": "How many sick days do I accrue each month?",
+          "answer": "The Sick Leave Policy states that employees accrue sick leave monthly for personal or family illness, but it does not specify the exact number of days accrued each month.",
+          "policy_title": "Sick Leave Policy",
+          "time_ms": 2492.025400046259,
+          "input_tokens": 266,
+          "output_tokens": 147,
+          "total_tokens": 413,
+          "extra": {
+            "retrieved": [
+              {
+                "title": "Sick Leave Policy",
+                "similarity": 0.711
+              },
+              {
+                "title": "Vacation Policy",
+                "similarity": 0.62
+              },
+              {
+                "title": "Bereavement Leave Policy",
+                "similarity": 0.592
+              }
+            ],
+            "embedding_tokens": 10
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "States what the policy says and that it does not specify the number of days."
+        }
+      }
+    },
+    {
+      "id": 23,
+      "type": "detail-missing",
+      "question": "How many public holidays does the company observe?",
+      "expected": [
+        "Holiday Schedule Policy"
+      ],
+      "answers": {
+        "rules": {
+          "approach": "Rules-based search",
+          "question": "How many public holidays does the company observe?",
+          "answer": "According to the Holiday Schedule Policy: Company holidays are published annually and observed accordingly.",
+          "policy_title": "Holiday Schedule Policy",
+          "time_ms": 0.43820030987262726,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0,
+          "extra": {
+            "top": [
+              {
+                "title": "Holiday Schedule Policy",
+                "score": 8.38
+              },
+              {
+                "title": "Public Speaking Policy",
+                "score": 8.38
+              },
+              {
+                "title": "Performance Review Policy",
+                "score": 0.0
+              }
+            ]
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "Quotes the Holiday Schedule Policy verbatim and adds no number."
+        },
+        "llm": {
+          "approach": "LLM without vector index",
+          "question": "How many public holidays does the company observe?",
+          "answer": "According to the Holiday Schedule Policy, company holidays are published annually and observed accordingly. The policy does not specify the exact number of public holidays observed.",
+          "policy_title": "Holiday Schedule Policy",
+          "time_ms": 5615.312399808317,
+          "input_tokens": 2810,
+          "output_tokens": 50,
+          "total_tokens": 2860,
+          "extra": {
+            "context_policies": 98
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "States what the policy says and that it does not specify the number of holidays."
+        },
+        "vector": {
+          "approach": "LLM with vector index",
+          "question": "How many public holidays does the company observe?",
+          "answer": "Company holidays are published annually and observed accordingly, but the policy does not specify the exact number of public holidays observed.",
+          "policy_title": "Holiday Schedule Policy",
+          "time_ms": 1666.4247000589967,
+          "input_tokens": 255,
+          "output_tokens": 35,
+          "total_tokens": 290,
+          "extra": {
+            "retrieved": [
+              {
+                "title": "Holiday Schedule Policy",
+                "similarity": 0.734
+              },
+              {
+                "title": "Vacation Policy",
+                "similarity": 0.654
+              },
+              {
+                "title": "Performance Review Policy",
+                "similarity": 0.618
+              }
+            ],
+            "embedding_tokens": 9
+          },
+          "policy_correct": true,
+          "verdict": "SUPPORTED",
+          "reason": "States what the policy says and that it does not specify the number of holidays."
+        }
+      }
+    },
+    {
+      "id": 26,
+      "type": "out-of-scope",
+      "question": "What does the company dental insurance cover?",
+      "expected": [
+        null
+      ],
+      "answers": {
+        "rules": {
+          "approach": "Rules-based search",
+          "question": "What does the company dental insurance cover?",
+          "answer": "According to the Warranty Policy: Products are covered under warranty for one year.",
+          "policy_title": "Warranty Policy",
+          "time_ms": 0.44090021401643753,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0,
+          "extra": {
+            "top": [
+              {
+                "title": "Warranty Policy",
+                "score": 4.19
+              },
+              {
+                "title": "Performance Review Policy",
+                "score": 0.0
+              },
+              {
+                "title": "Dress Code Policy",
+                "score": 0.0
+              }
+            ]
+          },
+          "policy_correct": false,
+          "verdict": "UNSUPPORTED",
+          "reason": "Answers a dental-insurance question with the product Warranty Policy, which is unrelated."
+        },
+        "llm": {
+          "approach": "LLM without vector index",
+          "question": "What does the company dental insurance cover?",
+          "answer": "I could not find a relevant policy.",
+          "policy_title": null,
+          "time_ms": 12594.951500184834,
+          "input_tokens": 2809,
+          "output_tokens": 27,
+          "total_tokens": 2836,
+          "extra": {
+            "context_policies": 98
+          },
+          "policy_correct": true,
+          "verdict": "NO_ANSWER",
+          "reason": "Correctly says no relevant policy exists."
+        },
+        "vector": {
+          "approach": "LLM with vector index",
+          "question": "What does the company dental insurance cover?",
+          "answer": "I could not find a relevant policy concerning dental insurance coverage.",
+          "policy_title": null,
+          "time_ms": 1638.0392001010478,
+          "input_tokens": 239,
+          "output_tokens": 22,
+          "total_tokens": 261,
+          "extra": {
+            "retrieved": [
+              {
+                "title": "Warranty Policy",
+                "similarity": 0.592
+              },
+              {
+                "title": "Performance Review Policy",
+                "similarity": 0.574
+              },
+              {
+                "title": "Shipping Policy",
+                "similarity": 0.571
+              }
+            ],
+            "embedding_tokens": 8
+          },
+          "policy_correct": true,
+          "verdict": "NO_ANSWER",
+          "reason": "Correctly says no relevant policy exists."
+        }
+      }
+    },
+    {
+      "id": 27,
+      "type": "out-of-scope",
+      "question": "Can I bring my dog to the office?",
+      "expected": [
+        null
+      ],
+      "answers": {
+        "rules": {
+          "approach": "Rules-based search",
+          "question": "Can I bring my dog to the office?",
+          "answer": "According to the Office Access Policy: Access badges must be worn and not shared.",
+          "policy_title": "Office Access Policy",
+          "time_ms": 0.46450039371848106,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0,
+          "extra": {
+            "top": [
+              {
+                "title": "Office Access Policy",
+                "score": 7.36
+              },
+              {
+                "title": "Home Office Equipment Policy",
+                "score": 7.36
+              },
+              {
+                "title": "Performance Review Policy",
+                "score": 0.0
+              }
+            ]
+          },
+          "policy_correct": false,
+          "verdict": "UNSUPPORTED",
+          "reason": "Answers a pets question with the Office Access (badge) Policy, which is unrelated."
+        },
+        "llm": {
+          "approach": "LLM without vector index",
+          "question": "Can I bring my dog to the office?",
+          "answer": "I could not find a relevant policy regarding bringing dogs or pets to the office.",
+          "policy_title": null,
+          "time_ms": 12934.001400135458,
+          "input_tokens": 2810,
+          "output_tokens": 35,
+          "total_tokens": 2845,
+          "extra": {
+            "context_policies": 98
+          },
+          "policy_correct": true,
+          "verdict": "NO_ANSWER",
+          "reason": "Correctly says no relevant policy exists."
+        },
+        "vector": {
+          "approach": "LLM with vector index",
+          "question": "Can I bring my dog to the office?",
+          "answer": "I could not find a relevant policy regarding bringing dogs or pets to the office.",
+          "policy_title": null,
+          "time_ms": 1772.9432000778615,
+          "input_tokens": 251,
+          "output_tokens": 35,
+          "total_tokens": 286,
+          "extra": {
+            "retrieved": [
+              {
+                "title": "Workplace Accommodation Policy",
+                "similarity": 0.669
+              },
+              {
+                "title": "Remote Work Policy",
+                "similarity": 0.638
+              },
+              {
+                "title": "Dress Code Policy",
+                "similarity": 0.637
+              }
+            ],
+            "embedding_tokens": 9
+          },
+          "policy_correct": true,
+          "verdict": "NO_ANSWER",
+          "reason": "Correctly says no relevant policy exists."
+        }
+      }
+    },
+    {
+      "id": 30,
+      "type": "out-of-scope",
+      "question": "What is the guest Wi-Fi password?",
+      "expected": [
+        null
+      ],
+      "answers": {
+        "rules": {
+          "approach": "Rules-based search",
+          "question": "What is the guest Wi-Fi password?",
+          "answer": "According to the Password Policy: Passwords must be changed every 90 days and meet complexity requirements.",
+          "policy_title": "Password Policy",
+          "time_ms": 0.507500022649765,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0,
+          "extra": {
+            "top": [
+              {
+                "title": "Password Policy",
+                "score": 8.38
+              },
+              {
+                "title": "Performance Review Policy",
+                "score": 0.0
+              },
+              {
+                "title": "Dress Code Policy",
+                "score": 0.0
+              }
+            ]
+          },
+          "policy_correct": false,
+          "verdict": "UNSUPPORTED",
+          "reason": "Answers a Wi-Fi question with the employee Password Policy, which does not cover guest Wi-Fi."
+        },
+        "llm": {
+          "approach": "LLM without vector index",
+          "question": "What is the guest Wi-Fi password?",
+          "answer": "I could not find a relevant policy concerning the guest Wi-Fi password.",
+          "policy_title": null,
+          "time_ms": 4552.163400221616,
+          "input_tokens": 2810,
+          "output_tokens": 34,
+          "total_tokens": 2844,
+          "extra": {
+            "context_policies": 98
+          },
+          "policy_correct": true,
+          "verdict": "NO_ANSWER",
+          "reason": "Correctly says no relevant policy exists."
+        },
+        "vector": {
+          "approach": "LLM with vector index",
+          "question": "What is the guest Wi-Fi password?",
+          "answer": "I could not find a relevant policy regarding the guest Wi-Fi password.",
+          "policy_title": null,
+          "time_ms": 17104.230199940503,
+          "input_tokens": 258,
+          "output_tokens": 116,
+          "total_tokens": 374,
+          "extra": {
+            "retrieved": [
+              {
+                "title": "Password Policy",
+                "similarity": 0.568
+              },
+              {
+                "title": "Office Access Policy",
+                "similarity": 0.553
+              },
+              {
+                "title": "Anti-Harassment Policy",
+                "similarity": 0.544
+              }
+            ],
+            "embedding_tokens": 9
+          },
+          "policy_correct": true,
+          "verdict": "NO_ANSWER",
+          "reason": "Correctly says no relevant policy exists."
+        }
+      }
+    }
+  ],
+  "index_build": {
+    "ms": 2,
+    "embedding_tokens": 2645,
+    "policies": 98
+  },
+  "meta": {
+    "model": "gemini-3.6-flash",
+    "embed_model": "gemini-embedding-001",
+    "embed_dim": 768,
+    "top_k": 3,
+    "policies": 98,
+    "approaches": {
+      "rules": "Rules-based search",
+      "llm": "LLM without vector index",
+      "vector": "LLM with vector index"
+    },
+    "judge": "reviewed after the run",
+    "run_at": "2026-10-09T09:12:04+00:00",
+    "judge_note": "every answer was reviewed against the full policy database after the run (by Claude, an AI assistant, because the Gemini free tier allows only ~20 requests per model per day). An answer counts as unsupported if it states anything the database does not say, or presents an unrelated policy as the answer. The same rules are implemented as an automatic Gemini judge in evaluation/run_eval.py for runs with a larger quota.",
+    "run_note": "Questions 1, 5 and 6 were run on 6 Oct 2026 and the rest on 9 Oct 2026 (free-tier daily limits)."
+  }
+}
