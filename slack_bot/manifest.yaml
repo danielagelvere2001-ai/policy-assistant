@@ -1,0 +1,34 @@
+# Paste this at https://api.slack.com/apps -> Create New App -> From an app manifest
+display_information:
+  name: Policy Bot
+  description: Answers company policy questions and names the relevant policy.
+  background_color: "#2f5d50"
+features:
+  bot_user:
+    display_name: Policy Bot
+    always_online: true
+  app_home:
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
+  slash_commands:
+    - command: /policy
+      description: Ask a company policy question
+      usage_hint: how many vacation days do I get?
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - chat:write
+      - commands
+      - im:history
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+      - message.im
+  interactivity:
+    is_enabled: false
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false
