@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Policy Assistant Comparison</title>
+<style>
+:root{--bg:#f7f7f5;--surface:#fff;--text:#1d1d1b;--muted:#6b6b66;--border:#e3e2dd;--accent:#2f5d50;
+--rules:#8a6d3b;--llm:#4a5fa8;--vector:#2f7d5b;--good:#2f7d5b;--bad:#b3452f;--goodbg:#e8f3ee;--badbg:#f8e9e5;--neutral:#efeee9}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#151614;--surface:#1e1f1c;--text:#ebeae5;--muted:#9c9b95;--border:#33342f;
+--accent:#7fc0a9;--rules:#d1b07a;--llm:#93a4e8;--vector:#6fcf9f;--good:#6fcf9f;--bad:#f08a72;--goodbg:#1f3229;--badbg:#3a2420;--neutral:#2a2b27}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1120px;margin:0 auto;padding:40px 16px 80px}
+h1{font-size:clamp(1.6rem,4vw,2.3rem);line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:1.25rem;margin:48px 0 14px}
+.sub{color:var(--muted);margin:0 0 24px}
+.muted{color:var(--muted);font-size:.85em}
+.approaches{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.approaches div{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:.92rem}
+.approaches b{display:block;margin-bottom:4px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
+.d-rules{background:var(--rules)}.d-llm{background:var(--llm)}.d-vector{background:var(--vector)}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.93rem}
+th,td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+thead th{font-size:.85rem;color:var(--muted);font-weight:600}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
+tbody th{font-weight:500}
+td.win{background:var(--goodbg);font-weight:600}
+.bad{color:var(--bad);font-weight:600}
+.discussion p{max-width:75ch;margin:0 0 16px}
+.method{font-size:.9rem;color:var(--muted);max-width:80ch;padding-left:20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 14px;font:inherit;font-size:.88rem;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
+.card h3{margin:4px 0 2px;font-size:1.05rem}
+.qtype{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.expected{font-size:.85rem;color:var(--muted)}
+.answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+@media (max-width:820px){.answers{grid-template-columns:1fr}}
+.ans{border-top:3px solid var(--border);background:var(--bg);border-radius:8px;padding:12px;font-size:.9rem;display:flex;flex-direction:column;gap:8px}
+.a-rules{border-top-color:var(--rules)}.a-llm{border-top-color:var(--llm)}.a-vector{border-top-color:var(--vector)}
+.ans-head{font-weight:600;font-size:.85rem}
+.ans-text{margin:0;flex:1}
+.policy{font-size:.85rem;font-weight:600}.policy.ok{color:var(--good)}.policy.wrong{color:var(--bad)}
+.retrieved{font-size:.8rem;color:var(--muted)}
+.stats{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.8rem;color:var(--muted);align-items:center}
+.verdict{border-radius:999px;padding:1px 9px;font-weight:600;font-size:.78rem}
+.v-supported{background:var(--goodbg);color:var(--good)}.v-unsupported{background:var(--badbg);color:var(--bad)}
+.v-no_answer{background:var(--neutral);color:var(--muted)}
+.reason{font-size:.78rem;color:var(--muted);font-style:italic}
+footer{margin-top:48px;font-size:.85rem;color:var(--muted)}
+a{color:var(--accent)}
+</style></head>
+<body><main>
+<h1>Company Policy Assistant: three approaches compared</h1>
+<p class="sub">9 test questions against a database of 98 company policies · model gemini-3.6-flash, embeddings gemini-embedding-001 · Daniela Gelvere</p>
+
+<div class="approaches">
+<div><b><span class="dot d-rules"></span>Rules-based search</b>Keyword matching with synonyms and IDF weighting. Returns the best policy's text word for word, with no LLM.</div>
+<div><b><span class="dot d-llm"></span>LLM without vector index</b>All 98 policies are pasted into the Gemini prompt for every question.</div>
+<div><b><span class="dot d-vector"></span>LLM with vector index</b>Policies are embedded once. Each question retrieves the top 3 most similar policies, and only those go to Gemini.</div>
+</div>
+
+<h2>Results</h2>
+<div class="tablewrap"><table><thead><tr><th scope="col">Metric (9 questions)</th><th scope="col"><span class="dot d-rules"></span>Rules-based search</th><th scope="col"><span class="dot d-llm"></span>LLM without vector index</th><th scope="col"><span class="dot d-vector"></span>LLM with vector index</th></tr></thead><tbody><tr><th scope="row">Correct policy identified</th><td class="">4/9 <span class=muted>(44%)</span></td><td class="win">9/9 <span class=muted>(100%)</span></td><td class="win">9/9 <span class=muted>(100%)</span></td></tr><tr><th scope="row">Unsupported answers (reviewed)</th><td class="">5/9 <span class=muted>(56%)</span></td><td class="win">0/9 <span class=muted>(0%)</span></td><td class="win">0/9 <span class=muted>(0%)</span></td></tr><tr><th scope="row">Declined out-of-scope questions</th><td class="">0/3 <span class=muted>(0%)</span></td><td class="win">3/3 <span class=muted>(100%)</span></td><td class="win">3/3 <span class=muted>(100%)</span></td></tr><tr><th scope="row">Average response time</th><td class="win">0.6 ms</td><td class="">18.93 s</td><td class="">5.16 s</td></tr><tr><th scope="row">Median response time</th><td class="win">0.5 ms</td><td class="">12.59 s</td><td class="">2.05 s</td></tr><tr><th scope="row">Average tokens per question</th><td class="win">0 <span class=muted>(0 in / 0 out)</span></td><td class="">2,853 <span class=muted>(2,812 in / 41 out)</span></td><td class="">324 <span class=muted>(262 in / 62 out)</span></td></tr><tr><th scope="row">One-time setup</th><td>none</td><td>none</td><td>embed 98 policies ≈ 2,645 tokens</td></tr></tbody></table></div>
+
+<h2>Discussion</h2>
+<div class="discussion"><p>On the nine test questions, the <strong>rules-based search</strong> was by far the fastest (under 1 ms) and used no tokens, but it named the right policy for only 4 of 9 questions. Because it always returns the closest keyword match, it answered all three questions the database does not cover with an unrelated policy: dental insurance became the product Warranty Policy, bringing a dog became the badge-focused Office Access Policy, and the guest Wi-Fi password became the employee Password Policy. It also missed two paraphrased questions (&quot;work from home&quot; and &quot;working from Spain&quot;), so 5 of its 9 answers were unsupported by the policy database. Both LLM approaches found the correct policy 9 of 9 times, gave no unsupported answers, refused all three out-of-scope questions, and said explicitly when a policy lacked the detail asked for (for example the number of sick days accrued per month) instead of inventing a number. The difference between them is cost: the <strong>LLM without a vector index</strong> sends all 98 policies with every question (about 2,850 tokens and a median of 12.6 s), while the <strong>LLM with a vector index</strong> sends only the three most similar policies (about 320 tokens, roughly 9 times fewer, and a median of 2.0 s).</p><p>The preferred approach is the <strong>LLM with a vector index</strong>, and it is the one the Slack bot uses. It matched the full-context LLM&#x27;s accuracy and groundedness at about a tenth of the tokens and with faster answers. It also scales: the full-context prompt grows with every policy added and would eventually hit context limits and cost, while the retrieval step keeps each prompt small. Its main risk is that the right policy might not be among the retrieved ones; in this test the correct policy was always ranked first (similarity 0.71–0.73), and for out-of-scope questions the LLM correctly ignored the weaker matches. These results come from a small sample (nine questions, limited by the Gemini free tier), one model (gemini-3.6-flash), and response times that include varying network delays, so they show a clear pattern rather than precise figures. The rules-based search remains useful as a free, instant fallback when no LLM is available.</p></div>
+
+<h2>Breakdown by question type</h2>
+<div class="tablewrap"><table><thead><tr><th scope="col">Question type</th><th scope="col"><span class="dot d-rules"></span>Rules-based search</th><th scope="col"><span class="dot d-llm"></span>LLM without vector index</th><th scope="col"><span class="dot d-vector"></span>LLM with vector index</th></tr></thead><tbody><tr><th scope="row">Direct wording</th><td>1/1 <span class=muted>policy</span> · <span class="">0 unsupported</span></td><td>1/1 <span class=muted>policy</span> · <span class="">0 unsupported</span></td><td>1/1 <span class=muted>policy</span> · <span class="">0 unsupported</span></td></tr><tr><th scope="row">Paraphrased</th><td>1/3 <span class=muted>policy</span> · <span class="bad">2 unsupported</span></td><td>3/3 <span class=muted>policy</span> · <span class="">0 unsupported</span></td><td>3/3 <span class=muted>policy</span> · <span class="">0 unsupported</span></td></tr><tr><th scope="row">Detail not in policy</th><td>2/2 <span class=muted>policy</span> · <span class="">0 unsupported</span></td><td>2/2 <span class=muted>policy</span> · <span class="">0 unsupported</span></td><td>2/2 <span class=muted>policy</span> · <span class="">0 unsupported</span></td></tr><tr><th scope="row">Not covered by any policy</th><td>0/3 <span class=muted>policy</span> · <span class="bad">3 unsupported</span></td><td>3/3 <span class=muted>policy</span> · <span class="">0 unsupported</span></td><td>3/3 <span class=muted>policy</span> · <span class="">0 unsupported</span></td></tr></tbody></table></div>
+
+<h2>Every question, side by side</h2>
+<div class="chips"><button class="chip on" data-f="all">All</button><button class="chip" data-f="direct">Direct wording</button><button class="chip" data-f="paraphrase">Paraphrased</button><button class="chip" data-f="detail-missing">Detail not in policy</button><button class="chip" data-f="out-of-scope">Not covered by any policy</button></div>
+<div id="cards"><article class="card" data-type="direct">
+  <header><span class="qtype">Direct wording</span><h3>How many vacation days do I get per year?</h3>
+  <div class="expected">Expected policy: Vacation Policy</div></header>
+  <div class="answers"><div class="ans a-rules">
+  <div class="ans-head"><span class="dot d-rules"></span>Rules-based search</div>
+  <p class="ans-text">According to the Vacation Policy: Employees receive 15 vacation days per year. Unused days may roll over.</p>
+  <div class="policy ok">✓ Vacation Policy</div>
+  
+  <div class="stats"><span>0.5 ms</span><span>0 tokens</span>
+    <span class="verdict v-supported" title="Quotes the Vacation Policy, which answers the question.">Supported</span></div>
+  <div class="reason">Quotes the Vacation Policy, which answers the question.</div>
+</div><div class="ans a-llm">
+  <div class="ans-head"><span class="dot d-llm"></span>LLM without vector index</div>
+  <p class="ans-text">Employees receive 15 vacation days per year. Unused days may roll over.</p>
+  <div class="policy ok">✓ Vacation Policy</div>
+  
+  <div class="stats"><span>27.45 s</span><span>2,849 tokens</span>
+    <span class="verdict v-supported" title="Every claim matches the cited policy text.">Supported</span></div>
+  <div class="reason">Every claim matches the cited policy text.</div>
+</div><div class="ans a-vector">
+  <div class="ans-head"><span class="dot d-vector"></span>LLM with vector index</div>
+  <p class="ans-text">Under the Vacation Policy, employees receive 15 vacation days per year. Unused days may roll over.</p>
+  <div class="policy ok">✓ Vacation Policy</div>
+  <div class="retrieved">Retrieved: Vacation Policy <span class=muted>0.72</span>, Holiday Schedule Policy <span class=muted>0.64</span>, Work From Abroad Policy <span class=muted>0.62</span></div>
+  <div class="stats"><span>13.12 s</span><span>351 tokens</span>
+    <span class="verdict v-supported" title="Every claim matches the cited policy text.">Supported</span></div>
+  <div class="reason">Every claim matches the cited policy text.</div>
+</div></div>
+</article><article class="card" data-type="paraphrase">
+  <header><span class="qtype">Paraphrased</span><h3>How many days a week can I work from home?</h3>
+  <div class="expected">Expected policy: Remote Work Policy</div></header>
+  <div class="answers"><div class="ans a-rules">
+  <div class="ans-head"><span class="dot d-rules"></span>Rules-based search</div>
+  <p class="ans-text">According to the Home Office Equipment Policy: Employees may request ergonomic equipment for remote work.</p>
+  <div class="policy wrong">✗ Home Office Equipment Policy</div>
+  
+  <div class="stats"><span>1.1 ms</span><span>0 tokens</span>
+    <span class="verdict v-unsupported" title="Presents the Home Office Equipment Policy as the answer; it says nothing about how many days one may work from home.">Unsupported</span></div>
+  <div class="reason">Presents the Home Office Equipment Policy as the answer; it says nothing about how many days one may work from home.</div>
+</div><div class="ans a-llm">
+  <div class="ans-head"><span class="dot d-llm"></span>LLM without vector index</div>
+  <p class="ans-text">According to the Remote Work Policy, employees may work remotely up to three days per week with manager approval.</p>
+  <div class="policy ok">✓ Remote Work Policy</div>
+  
+  <div class="stats"><span>79.33 s</span><span>2,854 tokens</span>
+    <span class="verdict v-supported" title="Every claim matches the cited policy text.">Supported</span></div>
+  <div class="reason">Every claim matches the cited policy text.</div>
+</div><div class="ans a-vector">
+  <div class="ans-head"><span class="dot d-vector"></span>LLM with vector index</div>
+  <p class="ans-text">Under the Remote Work Policy, employees may work remotely up to three days per week with manager approval.</p>
+  <div class="policy ok">✓ Remote Work Policy</div>
+  <div class="retrieved">Retrieved: Remote Work Policy <span class=muted>0.71</span>, Flexible Hours Policy <span class=muted>0.64</span>, Work From Abroad Policy <span class=muted>0.64</span></div>
+  <div class="stats"><span>4.63 s</span><span>298 tokens</span>
+    <span class="verdict v-supported" title="Every claim matches the cited policy text.">Supported</span></div>
+  <div class="reason">Every claim matches the cited policy text.</div>
+</div></div>
+</article><article class="card" data-type="paraphrase">
+  <header><span class="qtype">Paraphrased</span><h3>I&#x27;d like to spend a few weeks working from Spain. Is that okay?</h3>
+  <div class="expected">Expected policy: Work From Abroad Policy</div></header>
+  <div class="answers"><div class="ans a-rules">
+  <div class="ans-head"><span class="dot d-rules"></span>Rules-based search</div>
+  <p class="ans-text">According to the Onboarding Policy: New hires must complete onboarding within their first week.</p>
+  <div class="policy wrong">✗ Onboarding Policy</div>
+  
+  <div class="stats"><span>0.8 ms</span><span>0 tokens</span>
+    <span class="verdict v-unsupported" title="Presents the unrelated Onboarding Policy as the answer to a work-abroad question.">Unsupported</span></div>
+  <div class="reason">Presents the unrelated Onboarding Policy as the answer to a work-abroad question.</div>
+</div><div class="ans a-llm">
+  <div class="ans-head"><span class="dot d-llm"></span>LLM without vector index</div>
+  <p class="ans-text">According to the Work From Abroad Policy, employees may work abroad for up to 30 days with approval.</p>
+  <div class="policy ok">✓ Work From Abroad Policy</div>
+  
+  <div class="stats"><span>23.17 s</span><span>2,862 tokens</span>
+    <span class="verdict v-supported" title="Correctly states the 30-day limit with approval from the Work From Abroad Policy.">Supported</span></div>
+  <div class="reason">Correctly states the 30-day limit with approval from the Work From Abroad Policy.</div>
+</div><div class="ans a-vector">
+  <div class="ans-head"><span class="dot d-vector"></span>LLM with vector index</div>
+  <p class="ans-text">Employees may work abroad for up to 30 days with approval. Please note that the policy does not specify exact approved countries such as Spain.</p>
+  <div class="policy ok">✓ Work From Abroad Policy</div>
+  <div class="retrieved">Retrieved: Work From Abroad Policy <span class=muted>0.73</span>, Remote Work Policy <span class=muted>0.65</span>, Vacation Policy <span class=muted>0.64</span></div>
+  <div class="stats"><span>2.05 s</span><span>327 tokens</span>
+    <span class="verdict v-supported" title="Correctly states the 30-day limit with approval from the Work From Abroad Policy. Correctly notes that countries are not specified.">Supported</span></div>
+  <div class="reason">Correctly states the 30-day limit with approval from the Work From Abroad Policy. Correctly notes that countries are not specified.</div>
+</div></div>
+</article><article class="card" data-type="paraphrase">
+  <header><span class="qtype">Paraphrased</span><h3>My grandmother passed away. How many days off can I take?</h3>
+  <div class="expected">Expected policy: Bereavement Leave Policy</div></header>
+  <div class="answers"><div class="ans a-rules">
+  <div class="ans-head"><span class="dot d-rules"></span>Rules-based search</div>
+  <p class="ans-text">According to the Bereavement Leave Policy: Employees may take up to 5 days of bereavement leave.</p>
+  <div class="policy ok">✓ Bereavement Leave Policy</div>
+  
+  <div class="stats"><span>0.6 ms</span><span>0 tokens</span>
+    <span class="verdict v-supported" title="Quotes the Bereavement Leave Policy (up to 5 days).">Supported</span></div>
+  <div class="reason">Quotes the Bereavement Leave Policy (up to 5 days).</div>
+</div><div class="ans a-llm">
+  <div class="ans-head"><span class="dot d-llm"></span>LLM without vector index</div>
+  <p class="ans-text">According to the Bereavement Leave Policy, employees may take up to 5 days of bereavement leave.</p>
+  <div class="policy ok">✓ Bereavement Leave Policy</div>
+  
+  <div class="stats"><span>2.47 s</span><span>2,856 tokens</span>
+    <span class="verdict v-supported" title="Every claim matches the cited policy text.">Supported</span></div>
+  <div class="reason">Every claim matches the cited policy text.</div>
+</div><div class="ans a-vector">
+  <div class="ans-head"><span class="dot d-vector"></span>LLM with vector index</div>
+  <p class="ans-text">Under the Bereavement Leave Policy, employees may take up to 5 days of bereavement leave.</p>
+  <div class="policy ok">✓ Bereavement Leave Policy</div>
+  <div class="retrieved">Retrieved: Bereavement Leave Policy <span class=muted>0.72</span>, Vacation Policy <span class=muted>0.63</span>, Sick Leave Policy <span class=muted>0.63</span></div>
+  <div class="stats"><span>1.94 s</span><span>313 tokens</span>
+    <span class="verdict v-supported" title="Every claim matches the cited policy text.">Supported</span></div>
+  <div class="reason">Every claim matches the cited policy text.</div>
+</div></div>
+</article><article class="card" data-type="detail-missing">
+  <header><span class="qtype">Detail not in policy</span><h3>How many sick days do I accrue each month?</h3>
+  <div class="expected">Expected policy: Sick Leave Policy</div></header>
+  <div class="answers"><div class="ans a-rules">
+  <div class="ans-head"><span class="dot d-rules"></span>Rules-based search</div>
+  <p class="ans-text">According to the Sick Leave Policy: Employees accrue sick leave monthly for personal or family illness.</p>
+  <div class="policy ok">✓ Sick Leave Policy</div>
+  
+  <div class="stats"><span>0.6 ms</span><span>0 tokens</span>
+    <span class="verdict v-supported" title="Quotes the Sick Leave Policy verbatim and adds no number.">Supported</span></div>
+  <div class="reason">Quotes the Sick Leave Policy verbatim and adds no number.</div>
+</div><div class="ans a-llm">
+  <div class="ans-head"><span class="dot d-llm"></span>LLM without vector index</div>
+  <p class="ans-text">According to the Sick Leave Policy, employees accrue sick leave monthly for personal or family illness. However, the policy does not specify the exact number of sick days accrued each month.</p>
+  <div class="policy ok">✓ Sick Leave Policy</div>
+  
+  <div class="stats"><span>2.28 s</span><span>2,867 tokens</span>
+    <span class="verdict v-supported" title="States what the policy says and that it does not specify the number of days.">Supported</span></div>
+  <div class="reason">States what the policy says and that it does not specify the number of days.</div>
+</div><div class="ans a-vector">
+  <div class="ans-head"><span class="dot d-vector"></span>LLM with vector index</div>
+  <p class="ans-text">The Sick Leave Policy states that employees accrue sick leave monthly for personal or family illness, but it does not specify the exact number of days accrued each month.</p>
+  <div class="policy ok">✓ Sick Leave Policy</div>
+  <div class="retrieved">Retrieved: Sick Leave Policy <span class=muted>0.71</span>, Vacation Policy <span class=muted>0.62</span>, Bereavement Leave Policy <span class=muted>0.59</span></div>
+  <div class="stats"><span>2.49 s</span><span>413 tokens</span>
+    <span class="verdict v-supported" title="States what the policy says and that it does not specify the number of days.">Supported</span></div>
+  <div class="reason">States what the policy says and that it does not specify the number of days.</div>
+</div></div>
+</article><article class="card" data-type="detail-missing">
+  <header><span class="qtype">Detail not in policy</span><h3>How many public holidays does the company observe?</h3>
+  <div class="expected">Expected policy: Holiday Schedule Policy</div></header>
+  <div class="answers"><div class="ans a-rules">
+  <div class="ans-head"><span class="dot d-rules"></span>Rules-based search</div>
+  <p class="ans-text">According to the Holiday Schedule Policy: Company holidays are published annually and observed accordingly.</p>
+  <div class="policy ok">✓ Holiday Schedule Policy</div>
+  
+  <div class="stats"><span>0.4 ms</span><span>0 tokens</span>
+    <span class="verdict v-supported" title="Quotes the Holiday Schedule Policy verbatim and adds no number.">Supported</span></div>
+  <div class="reason">Quotes the Holiday Schedule Policy verbatim and adds no number.</div>
+</div><div class="ans a-llm">
+  <div class="ans-head"><span class="dot d-llm"></span>LLM without vector index</div>
+  <p class="ans-text">According to the Holiday Schedule Policy, company holidays are published annually and observed accordingly. The policy does not specify the exact number of public holidays observed.</p>
+  <div class="policy ok">✓ Holiday Schedule Policy</div>
+  
+  <div class="stats"><span>5.62 s</span><span>2,860 tokens</span>
+    <span class="verdict v-supported" title="States what the policy says and that it does not specify the number of holidays.">Supported</span></div>
+  <div class="reason">States what the policy says and that it does not specify the number of holidays.</div>
+</div><div class="ans a-vector">
+  <div class="ans-head"><span class="dot d-vector"></span>LLM with vector index</div>
+  <p class="ans-text">Company holidays are published annually and observed accordingly, but the policy does not specify the exact number of public holidays observed.</p>
+  <div class="policy ok">✓ Holiday Schedule Policy</div>
+  <div class="retrieved">Retrieved: Holiday Schedule Policy <span class=muted>0.73</span>, Vacation Policy <span class=muted>0.65</span>, Performance Review Policy <span class=muted>0.62</span></div>
+  <div class="stats"><span>1.67 s</span><span>290 tokens</span>
+    <span class="verdict v-supported" title="States what the policy says and that it does not specify the number of holidays.">Supported</span></div>
+  <div class="reason">States what the policy says and that it does not specify the number of holidays.</div>
+</div></div>
+</article><article class="card" data-type="out-of-scope">
+  <header><span class="qtype">Not covered by any policy</span><h3>What does the company dental insurance cover?</h3>
+  <div class="expected">Expected policy: none (not covered)</div></header>
+  <div class="answers"><div class="ans a-rules">
+  <div class="ans-head"><span class="dot d-rules"></span>Rules-based search</div>
+  <p class="ans-text">According to the Warranty Policy: Products are covered under warranty for one year.</p>
+  <div class="policy wrong">✗ Warranty Policy</div>
+  
+  <div class="stats"><span>0.4 ms</span><span>0 tokens</span>
+    <span class="verdict v-unsupported" title="Answers a dental-insurance question with the product Warranty Policy, which is unrelated.">Unsupported</span></div>
+  <div class="reason">Answers a dental-insurance question with the product Warranty Policy, which is unrelated.</div>
+</div><div class="ans a-llm">
+  <div class="ans-head"><span class="dot d-llm"></span>LLM without vector index</div>
+  <p class="ans-text">I could not find a relevant policy.</p>
+  <div class="policy ok">✓ No policy</div>
+  
+  <div class="stats"><span>12.59 s</span><span>2,836 tokens</span>
+    <span class="verdict v-no_answer" title="Correctly says no relevant policy exists.">No answer</span></div>
+  <div class="reason">Correctly says no relevant policy exists.</div>
+</div><div class="ans a-vector">
+  <div class="ans-head"><span class="dot d-vector"></span>LLM with vector index</div>
+  <p class="ans-text">I could not find a relevant policy concerning dental insurance coverage.</p>
+  <div class="policy ok">✓ No policy</div>
+  <div class="retrieved">Retrieved: Warranty Policy <span class=muted>0.59</span>, Performance Review Policy <span class=muted>0.57</span>, Shipping Policy <span class=muted>0.57</span></div>
+  <div class="stats"><span>1.64 s</span><span>261 tokens</span>
+    <span class="verdict v-no_answer" title="Correctly says no relevant policy exists.">No answer</span></div>
+  <div class="reason">Correctly says no relevant policy exists.</div>
+</div></div>
+</article><article class="card" data-type="out-of-scope">
+  <header><span class="qtype">Not covered by any policy</span><h3>Can I bring my dog to the office?</h3>
+  <div class="expected">Expected policy: none (not covered)</div></header>
+  <div class="answers"><div class="ans a-rules">
+  <div class="ans-head"><span class="dot d-rules"></span>Rules-based search</div>
+  <p class="ans-text">According to the Office Access Policy: Access badges must be worn and not shared.</p>
+  <div class="policy wrong">✗ Office Access Policy</div>
+  
+  <div class="stats"><span>0.5 ms</span><span>0 tokens</span>
+    <span class="verdict v-unsupported" title="Answers a pets question with the Office Access (badge) Policy, which is unrelated.">Unsupported</span></div>
+  <div class="reason">Answers a pets question with the Office Access (badge) Policy, which is unrelated.</div>
+</div><div class="ans a-llm">
+  <div class="ans-head"><span class="dot d-llm"></span>LLM without vector index</div>
+  <p class="ans-text">I could not find a relevant policy regarding bringing dogs or pets to the office.</p>
+  <div class="policy ok">✓ No policy</div>
+  
+  <div class="stats"><span>12.93 s</span><span>2,845 tokens</span>
+    <span class="verdict v-no_answer" title="Correctly says no relevant policy exists.">No answer</span></div>
+  <div class="reason">Correctly says no relevant policy exists.</div>
+</div><div class="ans a-vector">
+  <div class="ans-head"><span class="dot d-vector"></span>LLM with vector index</div>
+  <p class="ans-text">I could not find a relevant policy regarding bringing dogs or pets to the office.</p>
+  <div class="policy ok">✓ No policy</div>
+  <div class="retrieved">Retrieved: Workplace Accommodation Policy <span class=muted>0.67</span>, Remote Work Policy <span class=muted>0.64</span>, Dress Code Policy <span class=muted>0.64</span></div>
+  <div class="stats"><span>1.77 s</span><span>286 tokens</span>
+    <span class="verdict v-no_answer" title="Correctly says no relevant policy exists.">No answer</span></div>
+  <div class="reason">Correctly says no relevant policy exists.</div>
+</div></div>
+</article><article class="card" data-type="out-of-scope">
+  <header><span class="qtype">Not covered by any policy</span><h3>What is the guest Wi-Fi password?</h3>
+  <div class="expected">Expected policy: none (not covered)</div></header>
+  <div class="answers"><div class="ans a-rules">
+  <div class="ans-head"><span class="dot d-rules"></span>Rules-based search</div>
+  <p class="ans-text">According to the Password Policy: Passwords must be changed every 90 days and meet complexity requirements.</p>
+  <div class="policy wrong">✗ Password Policy</div>
+  
+  <div class="stats"><span>0.5 ms</span><span>0 tokens</span>
+    <span class="verdict v-unsupported" title="Answers a Wi-Fi question with the employee Password Policy, which does not cover guest Wi-Fi.">Unsupported</span></div>
+  <div class="reason">Answers a Wi-Fi question with the employee Password Policy, which does not cover guest Wi-Fi.</div>
+</div><div class="ans a-llm">
+  <div class="ans-head"><span class="dot d-llm"></span>LLM without vector index</div>
+  <p class="ans-text">I could not find a relevant policy concerning the guest Wi-Fi password.</p>
+  <div class="policy ok">✓ No policy</div>
+  
+  <div class="stats"><span>4.55 s</span><span>2,844 tokens</span>
+    <span class="verdict v-no_answer" title="Correctly says no relevant policy exists.">No answer</span></div>
+  <div class="reason">Correctly says no relevant policy exists.</div>
+</div><div class="ans a-vector">
+  <div class="ans-head"><span class="dot d-vector"></span>LLM with vector index</div>
+  <p class="ans-text">I could not find a relevant policy regarding the guest Wi-Fi password.</p>
+  <div class="policy ok">✓ No policy</div>
+  <div class="retrieved">Retrieved: Password Policy <span class=muted>0.57</span>, Office Access Policy <span class=muted>0.55</span>, Anti-Harassment Policy <span class=muted>0.54</span></div>
+  <div class="stats"><span>17.10 s</span><span>374 tokens</span>
+    <span class="verdict v-no_answer" title="Correctly says no relevant policy exists.">No answer</span></div>
+  <div class="reason">Correctly says no relevant policy exists.</div>
+</div></div>
+</article></div>
+
+<h2>How it was measured</h2>
+<ul class="method">
+<li><b>Correct policy</b>: the policy the approach named is one of the acceptable policies for that question. For out-of-scope questions the only correct result is “no policy”.</li>
+<li><b>Unsupported answer</b>: every answer was reviewed against the full policy database after the run (by Claude, an AI assistant, because the Gemini free tier allows only ~20 requests per model per day). An answer counts as unsupported if it states anything the database does not say, or presents an unrelated policy as the answer. The same rules are implemented as an automatic Gemini judge in evaluation/run_eval.py for runs with a larger quota.</li>
+<li><b>Response time</b>: wall-clock time of one call from a laptop, including the network round trips to the Gemini API (the query embedding plus generation for the vector approach).</li>
+<li><b>Tokens</b>: reported by the Gemini API (prompt + output). The vector approach also counts its query-embedding tokens.</li>
+<li><b>Runs</b>: Questions 1, 5 and 6 were run on 6 Oct 2026 and the rest on 9 Oct 2026 (free-tier daily limits). Network latency to the free Gemini tier varies a lot, so the median time is the fairer comparison.</li>
+</ul>
+<footer>Generated 2026-10-09T09:12:04+00:00. Source code, data and raw results are in the repository.</footer>
+</main>
+<script>
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+ document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));
+ const f=c.dataset.f;document.querySelectorAll('.card').forEach(k=>k.style.display=(f==='all'||k.dataset.type===f)?'':'none');
+}));
+</script>
+</body></html>
