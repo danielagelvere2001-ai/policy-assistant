@@ -87,6 +87,8 @@ def render(results: dict, discussion: list[str] | None = None, student: str = ""
     meta = results.get("meta", {})
     ib = results.get("index_build", {})
     discussion = discussion or load_discussion()
+    from site_builder.ask_box import ask_box
+    ask_css, ask_html, ask_js = ask_box(results)
 
     def best(metric, lower=True):
         vals = {k: s[k][metric] for k in ORDER}
@@ -212,7 +214,7 @@ td.win{{background:var(--goodbg);font-weight:600}}
 .reason{{font-size:.78rem;color:var(--muted);font-style:italic}}
 footer{{margin-top:48px;font-size:.85rem;color:var(--muted)}}
 a{{color:var(--accent)}}
-</style></head>
+{ask_css}</style></head>
 <body><main>
 <h1>Company Policy Assistant: three approaches compared</h1>
 <p class="sub">{len(results["questions"])} test questions against a database of {meta.get("policies", 98)} company policies · model {e(meta.get("model", ""))}, embeddings {e(meta.get("embed_model", ""))}{byline}</p>
@@ -222,6 +224,8 @@ a{{color:var(--accent)}}
 <div><b><span class="dot d-llm"></span>LLM without vector index</b>All {meta.get("policies", 98)} policies are pasted into the Gemini prompt for every question.</div>
 <div><b><span class="dot d-vector"></span>LLM with vector index</b>Policies are embedded once. Each question retrieves the top {meta.get("top_k", 3)} most similar policies, and only those go to Gemini.</div>
 </div>
+
+{ask_html}
 
 <h2>Results</h2>
 <div class="tablewrap">{table1}</div>
@@ -252,6 +256,7 @@ document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{{
  const f=c.dataset.f;document.querySelectorAll('.card').forEach(k=>k.style.display=(f==='all'||k.dataset.type===f)?'':'none');
 }}));
 </script>
+{ask_js}
 </body></html>"""
 
 
